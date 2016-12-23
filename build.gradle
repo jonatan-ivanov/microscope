@@ -1,0 +1,44 @@
+buildscript {
+    ext {
+        springBootVersion = '1.4.2.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'microscope'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'de.codecentric:spring-boot-admin-server:1.+'
+    compile 'de.codecentric:spring-boot-admin-server-ui:1.+'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+task cleanAll {
+    dependsOn clean, cleanIdea, cleanIdeaWorkspace
+}
+cleanAll.doLast {
+    delete 'out', 'logs'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
+}
