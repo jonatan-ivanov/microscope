@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
     }
 }
 
@@ -23,11 +23,11 @@ version = '0.0.1-SNAPSHOT'
 repositories {
     mavenCentral()
 }
-
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'de.codecentric:spring-boot-admin-server:1.+'
     compile 'de.codecentric:spring-boot-admin-server-ui:1.+'
+    compile 'de.codecentric:spring-boot-admin-server-ui-hystrix:1.+'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
