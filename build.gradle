@@ -7,18 +7,29 @@ buildscript {
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath 'com.bmuschko:gradle-docker-plugin:3.+'
     }
+}
+plugins {
+    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'com.bmuschko.docker-java-application'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'microscope'
 version = '0.0.1-SNAPSHOT'
+mainClassName = 'microscope.Microscope'
+
+springBoot  {
+    buildInfo()
+}
 
 repositories {
     mavenCentral()
@@ -32,11 +43,20 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
+docker {
+    javaApplication {
+        baseImage = 'openjdk:8'
+        tag = "$project.dockerNamespace/$project.applicationName:$project.version"
+        maintainer = project.maintainer
+        ports = [8090]
+    }
+}
+
 task cleanAll {
     dependsOn clean, cleanIdea, cleanIdeaWorkspace
-}
-cleanAll.doLast {
-    delete 'out', 'logs'
+    doLast {
+        delete 'out', 'logs'
+    }
 }
 
 task wrapper(type: Wrapper) {
