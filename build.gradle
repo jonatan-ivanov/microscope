@@ -50,6 +50,10 @@ docker {
         maintainer = project.maintainer
         ports = [8090]
     }
+    registryCredentials {
+        username = dockerRegistryUserName
+        password = dockerRegistryPassword
+    }
 }
 
 task cleanAll {
