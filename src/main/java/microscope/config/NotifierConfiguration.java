@@ -4,7 +4,6 @@ import de.codecentric.boot.admin.notify.Notifier;
 import de.codecentric.boot.admin.notify.RemindingNotifier;
 import de.codecentric.boot.admin.notify.filter.FilteringNotifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -16,12 +15,13 @@ import org.springframework.scheduling.annotation.Scheduled;
  */
 @Configuration
 @EnableScheduling
-@ConditionalOnBean(Notifier.class)
 public class NotifierConfiguration {
-    @Autowired private Notifier delegate;
+    @Autowired private Notifier notifier;
 
     @Bean
     public FilteringNotifier filteringNotifier() {
+        //TODO: figure out something better e.g.: conditional bean creation
+        Notifier delegate = (notifier != null) ? notifier : event -> {};
         return new FilteringNotifier(delegate);
     }
 
