@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.4.2.RELEASE'
+        springBootVersion = '1.4.3.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -24,7 +24,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'microscope'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2'
 mainClassName = 'microscope.Microscope'
 
 springBoot  {
@@ -64,5 +64,5 @@ task cleanAll {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
+    gradleVersion = '3.3'
 }
