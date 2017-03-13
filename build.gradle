@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.4.3.RELEASE'
+        springBootVersion = '1.5.2.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -35,7 +35,7 @@ repositories {
 }
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Camden.RELEASE'
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Camden.SR6'
     }
 }
 dependencies {
@@ -73,5 +73,6 @@ task cleanAll {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
+    gradleVersion = '3.4.1'
+    distributionType = Wrapper.DistributionType.BIN
 }
