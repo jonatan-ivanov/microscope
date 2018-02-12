@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
  * @author Jonatan Ivanov
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.boot.admin.discovery.ignore-ssl-errors")
+@ConditionalOnProperty("spring.boot.admin.discovery.ignore-ssl-errors")
 public class IgnoreSslErrorsConfig {
     @Bean
     public RestTemplateBuilder restTemplateBuilder() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
