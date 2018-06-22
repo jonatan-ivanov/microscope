@@ -2,10 +2,14 @@ package microscope.config;
 
 import com.netflix.appinfo.AmazonInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.boot.info.GitProperties;
+import org.springframework.boot.info.InfoProperties;
 import org.springframework.cloud.client.CommonsClientAutoConfiguration;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration;
@@ -15,8 +19,15 @@ import org.springframework.cloud.netflix.eureka.metadata.ManagementMetadataProvi
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.netflix.appinfo.AmazonInfo.MetaDataKey.localHostname;
 import static com.netflix.appinfo.AmazonInfo.MetaDataKey.localIpv4;
@@ -50,10 +61,17 @@ public class EurekaConfig {
     private static final String HEALTH_CHECK_URL_KEY = "eureka.instance.healthCheckUrl";
     private static final String SECURE_HEALTH_CHECK_URL_KEY = "eureka.instance.secureHealthCheckUrl";
     private static final String HOME_PAGE_URL_KEY = "eureka.instance.homePageUrl";
+    public static final String JAVA_VERSION_KEY = "java.version";
+    public static final String SPRING_PROFILES_ACTIVE_KEY = "spring.profiles.active";
 
     @Autowired private EurekaInstanceConfigBean instance;
     @Autowired private ManagementMetadataProvider metadataProvider;
-    @Autowired(required = false) private AmazonInfo amazonInfo;
+    @Autowired private AmazonInfo amazonInfo;
+    @Autowired private GitProperties gitProperties;
+    @Autowired private BuildProperties buildProperties;
+    @Autowired private Environment environment;
+    @Value("${eureka.instance.metadata.git-attributes}") private String[] gitAttributes;
+    @Value("${eureka.instance.metadata.build-attributes}") private String[] buildAttributes;
 
     private final RelaxedPropertyResolver propertyResolver;
     private final boolean sslEnabled;
@@ -89,7 +107,17 @@ public class EurekaConfig {
     }
 
     private void populateMetadataMap() {
+        instance.getMetadataMap().putAll(toMap(gitProperties, "git", Arrays.asList(gitAttributes)));
+        instance.getMetadataMap().putAll(toMap(buildProperties,"build", Arrays.asList(buildAttributes)));
+        instance.getMetadataMap().put(SPRING_PROFILES_ACTIVE_KEY, Arrays.toString(environment.getActiveProfiles()));
+        instance.getMetadataMap().put(JAVA_VERSION_KEY, System.getProperty(JAVA_VERSION_KEY));
         instance.getMetadataMap().put(SBA_MGMT_CONTEXT_PATH_KEY, getProperty(MGMT_CONTEXT_PATH_KEY));
+    }
+
+    private Map<String, String> toMap(InfoProperties infoProperties, String prefix, List<String> attributes) {
+        return StreamSupport.stream(infoProperties.spliterator(), false)
+            .filter(entry -> attributes.contains(entry.getKey()))
+            .collect(Collectors.toMap(entry -> prefix + "." + entry.getKey(), entry -> entry.getValue()));
     }
 
     private void fixPorts() {
